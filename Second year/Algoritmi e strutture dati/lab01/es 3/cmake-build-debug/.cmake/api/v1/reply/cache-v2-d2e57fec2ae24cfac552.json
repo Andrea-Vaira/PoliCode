@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/andre/Desktop/PoliCode/Second year/Algoritmi e strutture dati/lab01/es1/cmake-build-debug"
+			"value" : "c:/Users/andre/Desktop/PoliTo/PoliCode/Second year/Algoritmi e strutture dati/lab01/es 3/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -431,7 +431,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andre/Desktop/PoliCode/Second year/Algoritmi e strutture dati/lab01/es1/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/andre/Desktop/PoliTo/PoliCode/Second year/Algoritmi e strutture dati/lab01/es 3/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -503,7 +503,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/andre/Desktop/PoliCode/Second year/Algoritmi e strutture dati/lab01/es1"
+			"value" : "C:/Users/andre/Desktop/PoliTo/PoliCode/Second year/Algoritmi e strutture dati/lab01/es 3"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -515,7 +515,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Program Files (x86)/es1"
+			"value" : "C:/Program Files (x86)/es_3"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -731,7 +731,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "es1"
+			"value" : "es_3"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1138,7 +1138,7 @@
 			"value" : "TRUE"
 		},
 		{
-			"name" : "es1_BINARY_DIR",
+			"name" : "es_3_BINARY_DIR",
 			"properties" : 
 			[
 				{
@@ -1147,10 +1147,10 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andre/Desktop/PoliCode/Second year/Algoritmi e strutture dati/lab01/es1/cmake-build-debug"
+			"value" : "C:/Users/andre/Desktop/PoliTo/PoliCode/Second year/Algoritmi e strutture dati/lab01/es 3/cmake-build-debug"
 		},
 		{
-			"name" : "es1_IS_TOP_LEVEL",
+			"name" : "es_3_IS_TOP_LEVEL",
 			"properties" : 
 			[
 				{
@@ -1162,7 +1162,7 @@
 			"value" : "ON"
 		},
 		{
-			"name" : "es1_SOURCE_DIR",
+			"name" : "es_3_SOURCE_DIR",
 			"properties" : 
 			[
 				{
@@ -1171,7 +1171,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andre/Desktop/PoliCode/Second year/Algoritmi e strutture dati/lab01/es1"
+			"value" : "C:/Users/andre/Desktop/PoliTo/PoliCode/Second year/Algoritmi e strutture dati/lab01/es 3"
 		}
 	],
 	"kind" : "cache",
