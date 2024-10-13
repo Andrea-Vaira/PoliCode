@@ -113,7 +113,20 @@ void ricercaDicotomica(Corsa corse[], int n, const char *partenza) {
 
 int main() {
     Corsa corse[MAX_TRATTE];
+    Corsa *per_data[MAX_TRATTE], *per_codice[MAX_TRATTE], *per_partenza[MAX_TRATTE], *per_destinazione[MAX_TRATTE];
     int n = leggiCorse("corse.txt", corse);
+
+    for (int i = 0; i < n; i++) {
+        per_data[i] = &corse[i];
+        per_codice[i] = &corse[i];
+        per_partenza[i] = &corse[i];
+        per_destinazione[i] = &corse[i];
+    }
+
+    qsort(per_data, n, sizeof(Corsa *), confrontaDataOra);
+    qsort(per_codice, n, sizeof(Corsa *), confrontaCodiceTratta);
+    qsort(per_partenza, n, sizeof(Corsa *), confrontaPartenza);
+    qsort(per_destinazione, n, sizeof(Corsa *), confrontaDestinazione);
 
     int scelta;
     do {
