@@ -14,75 +14,11 @@ typedef struct {
     int ritardo;
 } Corsa;
 
-int leggiCorse(const char *filename, Corsa **corse) {
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL) {
-        printf("Errore nell'apertura del file.\n");
-        return 0;
-    }
+int leggiCorse(const char *filename, Corsa **corse);
 
-    int n;
-    fscanf(fp, "%d", &n);
+void stampaCorse(Corsa corse[], int n, const char *filename);
 
-    *corse = (Corsa *) malloc(n * sizeof(Corsa));
-    if (*corse == NULL) {
-        printf("Errore di allocazione della memoria.\n");
-        fclose(fp);
-        return 0;
-    }
-
-    for (int i = 0; i < n; i++) {
-        fscanf(fp, "%s %s %s %s %s %s %d",
-               (*corse)[i].codice_tratta,
-               (*corse)[i].partenza,
-               (*corse)[i].destinazione,
-               (*corse)[i].data,
-               (*corse)[i].ora_partenza,
-               (*corse)[i].ora_arrivo,
-               &(*corse)[i].ritardo);
-    }
-
-    fclose(fp);
-    return n;
-}
-
-void stampaCorse(Corsa corse[], int n, const char *filename) {
-    FILE *fp = stdout;
-    if (filename != NULL) {
-        fp = fopen(filename, "w");
-        if (fp == NULL) {
-            printf("Errore nell'apertura del file.\n");
-            return;
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        fprintf(fp, "%s %s %s %s %s %s %d\n",
-                corse[i].codice_tratta,
-                corse[i].partenza,
-                corse[i].destinazione,
-                corse[i].data,
-                corse[i].ora_partenza,
-                corse[i].ora_arrivo,
-                corse[i].ritardo);
-    }
-
-    if (fp != stdout) {
-        fclose(fp);
-    }
-}
-
-int confrontaDataOra(const void *a, const void *b) {
-    Corsa *c1 = (Corsa *)a;
-    Corsa *c2 = (Corsa *)b;
-
-    int cmp = strcmp(c1->data, c2->data);
-    if (cmp == 0) {
-        cmp = strcmp(c1->ora_partenza, c2->ora_partenza);
-        return cmp;
-    }
-    return cmp;
-}
+int confrontaDataOra(const void *a, const void *b);
 
 int confrontaCodiceTratta(const void *a, const void *b) {
     return strcmp(((Corsa *)a)->codice_tratta, ((Corsa *)b)->codice_tratta);
@@ -96,50 +32,9 @@ int confrontaDestinazione(const void *a, const void *b) {
     return strcmp(((Corsa *)a)->destinazione, ((Corsa *)b)->destinazione);
 }
 
-void ricercaLineare(Corsa corse[], int n, const char *partenza) {
-    for (int i = 0; i < n; i++) {
-        if (strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) {
-            printf("%s %s %s %s %s %s %d\n",
-                   corse[i].codice_tratta,
-                   corse[i].partenza,
-                   corse[i].destinazione,
-                   corse[i].data,
-                   corse[i].ora_partenza,
-                   corse[i].ora_arrivo,
-                   corse[i].ritardo);
-        }
-    }
-}
+void ricercaLineare(Corsa corse[], int n, const char *partenza);
 
-void ricercaDicotomica(Corsa corse[], int n, const char *partenza) {
-    int l = 0, r = n - 1;
-    while (l <= r) {
-        int m = (l + r) / 2;
-        int cmp = strncmp(corse[m].partenza, partenza, strlen(partenza));
-        if (cmp == 0) {
-            int i = m;
-            while (i >= 0 && strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) i--;
-            i++;
-            while (i < n && strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) {
-                printf("%s %s %s %s %s %s %d\n",
-                       corse[i].codice_tratta,
-                       corse[i].partenza,
-                       corse[i].destinazione,
-                       corse[i].data,
-                       corse[i].ora_partenza,
-                       corse[i].ora_arrivo,
-                       corse[i].ritardo);
-                i++;
-            }
-            return;
-        } else if (cmp < 0) {
-            l = m + 1;
-        } else {
-            r = m - 1;
-        }
-    }
-    printf("Nessuna corsa trovata.\n");
-}
+void ricercaDicotomica(Corsa corse[], int n, const char *partenza);
 
 int main() {
     Corsa *corse = NULL;
@@ -219,4 +114,119 @@ int main() {
 
     free(corse);
     return 0;
+}
+
+int leggiCorse(const char *filename, Corsa **corse) {
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Errore nell'apertura del file.\n");
+        return 0;
+    }
+
+    int n;
+    fscanf(fp, "%d", &n);
+
+    *corse = (Corsa *) malloc(n * sizeof(Corsa));
+    if (*corse == NULL) {
+        printf("Errore di allocazione della memoria.\n");
+        fclose(fp);
+        return 0;
+    }
+
+    for (int i = 0; i < n; i++) {
+        fscanf(fp, "%s %s %s %s %s %s %d",
+               (*corse)[i].codice_tratta,
+               (*corse)[i].partenza,
+               (*corse)[i].destinazione,
+               (*corse)[i].data,
+               (*corse)[i].ora_partenza,
+               (*corse)[i].ora_arrivo,
+               &(*corse)[i].ritardo);
+    }
+
+    fclose(fp);
+    return n;
+}
+
+void stampaCorse(Corsa corse[], int n, const char *filename) {
+    FILE *fp = stdout;
+    if (filename != NULL) {
+        fp = fopen(filename, "w");
+        if (fp == NULL) {
+            printf("Errore nell'apertura del file.\n");
+            return;
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        fprintf(fp, "%s %s %s %s %s %s %d\n",
+                corse[i].codice_tratta,
+                corse[i].partenza,
+                corse[i].destinazione,
+                corse[i].data,
+                corse[i].ora_partenza,
+                corse[i].ora_arrivo,
+                corse[i].ritardo);
+    }
+
+    if (fp != stdout) {
+        fclose(fp);
+    }
+}
+
+int confrontaDataOra(const void *a, const void *b) {
+    Corsa *c1 = (Corsa *)a;
+    Corsa *c2 = (Corsa *)b;
+
+    int cmp = strcmp(c1->data, c2->data);
+    if (cmp == 0) {
+        cmp = strcmp(c1->ora_partenza, c2->ora_partenza);
+        return cmp;
+    }
+    return cmp;
+}
+
+void ricercaLineare(Corsa corse[], int n, const char *partenza) {
+    for (int i = 0; i < n; i++) {
+        if (strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) {
+            printf("%s %s %s %s %s %s %d\n",
+                   corse[i].codice_tratta,
+                   corse[i].partenza,
+                   corse[i].destinazione,
+                   corse[i].data,
+                   corse[i].ora_partenza,
+                   corse[i].ora_arrivo,
+                   corse[i].ritardo);
+        }
+    }
+}
+
+void ricercaDicotomica(Corsa corse[], int n, const char *partenza) {
+    int l = 0, r = n - 1;
+    while (l <= r) {
+        int m = (l + r) / 2;
+        int cmp = strncmp(corse[m].partenza, partenza, strlen(partenza));
+        if (cmp == 0) {
+            int i = m;
+            while (i >= 0 && strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) i--;
+            i++;
+            while (i < n && strncmp(corse[i].partenza, partenza, strlen(partenza)) == 0) {
+                printf("%s %s %s %s %s %s %d\n",
+                       corse[i].codice_tratta,
+                       corse[i].partenza,
+                       corse[i].destinazione,
+                       corse[i].data,
+                       corse[i].ora_partenza,
+                       corse[i].ora_arrivo,
+                       corse[i].ritardo);
+                i++;
+            }
+            return;
+        } else if (cmp < 0) {
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
+    }
+    printf("Nessuna corsa trovata.\n");
 }
