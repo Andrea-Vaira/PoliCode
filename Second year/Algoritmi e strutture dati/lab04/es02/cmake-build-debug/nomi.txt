@@ -1,0 +1,5 @@
+A1234 Mario Rossi 15/06/1995 ViaRoma Milano 20100
+A2345 Anna Bianchi 12/08/2001 ViaGaribaldi Torino 10100
+A3456 Luca Verdi 22/03/1989 ViaNapoli Napoli 80100
+A4567 Elisa Neri 05/10/1992 ViaVenezia Venezia 30100
+A5678 Giovanni Gialli 01/01/2000 ViaFirenze Firenze 50100
