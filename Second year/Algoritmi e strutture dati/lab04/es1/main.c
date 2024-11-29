@@ -16,7 +16,6 @@ void leggi_grafo(const char *filename, int *N, int *E, arco archi[]) {
 
     fscanf(file, "%d %d", N, E);
 
-    // Legge gli archi
     for (int i = 0; i < *E; i++) {
         fscanf(file, "%d %d", &archi[i].u, &archi[i].v);
     }
@@ -24,7 +23,6 @@ void leggi_grafo(const char *filename, int *N, int *E, arco archi[]) {
     fclose(file);
 }
 
-// Funzione per verificare se un sottoinsieme è un vertex cover
 int is_vertex_cover(int N, arco archi[], int E, int subset) {
     for (int i = 0; i < E; i++) {
         int u = archi[i].u;
@@ -38,7 +36,6 @@ int is_vertex_cover(int N, arco archi[], int E, int subset) {
     return 1;
 }
 
-// Funzione per stampare il vertex cover
 void stampa_vertex_cover(int subset, int N) {
     printf("{ ");
     for (int i = 0; i < N; i++) {
@@ -49,9 +46,9 @@ void stampa_vertex_cover(int subset, int N) {
     printf("}\n");
 }
 
-// Funzione principale per trovare tutti i vertex cover
 void trova_vertex_covers(int N, arco archi[], int E) {
-    int totale_subset = 1 << N; // 2^N possibili sottoinsiemi
+    int totale_subset = 1 << N;
+
 
     printf("Tutti i vertex cover:\n");
     for (int subset = 1; subset < totale_subset; subset++) {
@@ -60,6 +57,7 @@ void trova_vertex_covers(int N, arco archi[], int E) {
         }
     }
 }
+
 int main() {
     int N, E;
     arco archi[MAX_VERTICI];
