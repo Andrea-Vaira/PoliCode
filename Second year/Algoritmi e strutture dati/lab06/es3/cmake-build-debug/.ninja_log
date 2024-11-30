@@ -1,0 +1,9 @@
+# ninja log v5
+26	185	7546756059243032	CMakeFiles/es3.dir/statistiche.c.obj	391081d040c3c961
+18	201	7546756059458710	CMakeFiles/es3.dir/inventario.c.obj	8cfddf773d4de332
+1	210	7546756059538771	CMakeFiles/es3.dir/main.c.obj	239425ddb77a0b2f
+10	219	7546756059658721	CMakeFiles/es3.dir/personaggio.c.obj	204c3d325b3c9e36
+220	411	7546756061514933	es3.exe	458f540ada703e68
+4	191	7546757233805502	CMakeFiles/es3.dir/main.c.obj	239425ddb77a0b2f
+13	207	7546757233970356	CMakeFiles/es3.dir/personaggio.c.obj	204c3d325b3c9e36
+207	398	7546757235807559	es3.exe	458f540ada703e68
