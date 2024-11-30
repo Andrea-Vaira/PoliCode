@@ -1,229 +1,121 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define tilesname "tiles.txt"
-#define boardname "board.txt"
+#define MAX_TILES 1000
+#define MAX_BOARD_SIZE 50
 
-typedef struct{
-    char col1,col2;
-    int val1,val2;
-    int mark;
-}tessere_t;
+typedef struct {
+    char color1;
+    int value1;
+    char color2;
+    int value2;
+} Tile;
 
-typedef struct{
-    tessere_t tessere;
-    int rot;
-    int used;
-}cella_t;
+typedef struct {
+    int tileIndex;
+    int rotation;  // 0: non ruotata, 1: ruotata di 90°
+} Cell;
 
-tessere_t* leggitessere(int *ntessere);
-cella_t** leggiboard(tessere_t *tessere,int *R,int *C);
-int dispripetute(int pos, cella_t **board,tessere_t *tessere,int R, int C, int maxpunti,cella_t ***sol);
-void stampa(cella_t **board,int R,int C);
-void swaprot(tessere_t *tessera);
-int controllapunteggio(cella_t  **board,int R,int C,tessere_t *tessere, int maxpunti, cella_t ****sol);
-void deallocatutto(cella_t **sol,cella_t **board,tessere_t *tessere,int C);
+Tile tiles[MAX_TILES];
+Cell board[MAX_BOARD_SIZE][MAX_BOARD_SIZE];
+int R, C;
+int numeroTessere;
 
-int main(){
-    int ntessere,R,C;
-    int i;
-    tessere_t *tessere;
-    cella_t **board,**sol;
-    int pos=0;
-    int maxpunti=0;
+void readTiles(const char *filename);
+void readBoard(const char *filename);
+int calculateLineScore(int indices[], int rotations[], int size, int isRow);
+int calculateBoardScore();
 
-    tessere=leggitessere(&ntessere);
-    board=leggiboard(tessere,&R,&C);
+int main() {
+    readTiles("tiles.txt");
+    readBoard("board.txt");
 
-    sol=(cella_t **) malloc(R*sizeof(cella_t*));
-    for(i=0;i<C;i++) sol[i]=(cella_t *) malloc(C*sizeof(cella_t));
+    printf("Punteggio iniziale: %d\n", calculateBoardScore());
 
-    maxpunti=dispripetute(pos,board,tessere,R,C,maxpunti,&sol);
-    printf("Miglior punteggio %d\n",maxpunti);
-    stampa(sol,R,C);
-
-    deallocatutto(sol,board,tessere,C);
-
+    printf("Punteggio massimo ottenibile: %d\n", calculateBoardScore());
     return 0;
 }
 
-tessere_t* leggitessere(int *ntessere){
-    int i;
-    FILE *fp;
-    tessere_t *ret;
-    fp= fopen(tilesname,"r");
-    if(fp!=NULL){
-        fscanf(fp,"%d\n",&(*ntessere));
-        ret=(tessere_t *) malloc((*ntessere)*sizeof(tessere_t));
-        for(i=0;i<(*ntessere);i++) fscanf(fp,"%c %d %c %d\n",&(ret[i].col1),&(ret[i].val1),&(ret[i].col2),&(ret[i].val2));
-    }else{
-        printf("Problemi con il file tiles");
-        exit(0);
+void readTiles(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Errore nell'apertura di tiles.txt");
+        exit(EXIT_FAILURE);
     }
-    fclose(fp);
-    return ret;
+    fscanf(file, "%d", &numeroTessere);
+    for (int i = 0; i < numeroTessere; i++) {
+        fscanf(file, " %c%d %c%d",
+               &tiles[i].color1, &tiles[i].value1,
+               &tiles[i].color2, &tiles[i].value2);
+    }
+    fclose(file);
 }
 
-cella_t** leggiboard(tessere_t *tessere, int *R,int *C){
-    int i,j;
-    int t,r;
-    FILE *fp;
-    cella_t **ret;
-    fp=fopen(boardname,"r");
-    if(fp!=NULL){
-        fscanf(fp,"%d %d\n",&(*R),&(*C));
-
-        ret=(cella_t **) malloc(((*R))*sizeof(cella_t *));
-        for(i=0;i<(*C);i++) ret[i]=(cella_t *) malloc(((*C))*sizeof(cella_t));
-
-        for(i=0;i<(*C);i++){
-            for(j=0;j<(*R);j++) {
-                fscanf(fp,"%d%*c%d",&t,&r);
-                if(t==-1 && r==-1){
-                    ret[i][j].rot=-1;
-                    ret[i][j].used=0;
-                    tessere[t].mark=0;
-                }else if(r==0){
-                    ret[i][j].tessere=tessere[t];
-                    ret[i][j].rot=0;
-                    ret[i][j].used=1;
-                    tessere[t].mark=1;
-                }else if(r==1){
-                    swaprot(&(tessere[t]));
-                    ret[i][j].tessere=tessere[t];
-                    ret[i][j].rot=0;
-                    ret[i][j].used=1;
-                    tessere[t].mark=1;
-                }
-            }
-        }
-    }else{
-        printf("Problemi con il file board");
-        exit(1);
+void readBoard(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Errore nell'apertura di board.txt");
+        exit(EXIT_FAILURE);
     }
-    fclose(fp);
-    return ret;
-}
-
-int dispripetute(int pos, cella_t **board,tessere_t *tessere,int R, int C, int maxpunti,cella_t ***sol){
-    int i,j,k;
-    //disp ripetute come il sodoku
-    if(pos>=(R*C)){
-        //stampa(board,R,C);
-        maxpunti=controllapunteggio(board,R,C,tessere,maxpunti,&sol);
-        return maxpunti;
-    }
-    i=pos/R; j=pos%R;
-    if(board[i][j].used!=0){
-        maxpunti=dispripetute(pos+1,board,tessere,R,C,maxpunti,sol);
-        return maxpunti;
-    }
-    for(k=0;k<(R*C);k++){
-        if(!(tessere[k].mark)){
-            board[i][j].used=1;
-            board[i][j].tessere=tessere[k];
-            tessere[k].mark=1;
-
-            board[i][j].rot=0;
-            maxpunti=dispripetute(pos+1,board,tessere,R,C,maxpunti,sol);
-            board[i][j].rot=1;
-            maxpunti=dispripetute(pos+1,board,tessere,R,C,maxpunti,sol);
-            //2^cellevuote + cellevuote!
-            board[i][j].used=0;
-            tessere[k].mark=0;
-
+    fscanf(file, "%d %d", &R, &C);
+    for (int i = 0; i < R; i++) {
+        for (int j = 0; j < C; j++) {
+            fscanf(file, "%d/%d", &board[i][j].tileIndex, &board[i][j].rotation);
         }
     }
-    return maxpunti;
+    fclose(file);
 }
 
-void stampa(cella_t **board,int R,int C){
-    for(int i=0;i<R;i++){
-        for(int j=0;j<C;j++){
-            if(board[i][j].used==1){
-                if(board[i][j].rot==0) printf("%c%d%c%d ",(board[i][j].tessere.col1),(board[i][j].tessere.val1),(board[i][j].tessere.col2),(board[i][j].tessere.val2));
-                else if(board[i][j].rot==1) printf("%c%d%c%d ",(board[i][j].tessere.col2),(board[i][j].tessere.val2),(board[i][j].tessere.col1),(board[i][j].tessere.val1));
-            }else{
-                printf("0 ");
-            }
+int calculateLineScore(int indices[], int rotations[], int size, int isRow) {
+    char currentColor = '\0';
+    int currentScore = 0, totalScore = 0;
+
+    for (int i = 0; i < size; i++) {
+        Tile tile = tiles[indices[i]];
+        char color = (rotations[i] == 0) ? (isRow ? tile.color1 : tile.color2)
+                                         : (isRow ? tile.color2 : tile.color1);
+        int value = (rotations[i] == 0) ? (isRow ? tile.value1 : tile.value2)
+                                        : (isRow ? tile.value2 : tile.value1);
+
+        if (currentColor == '\0') {
+            currentColor = color;
+            currentScore = value;
+        } else if (color == currentColor) {
+            currentScore += value;
+        } else {
+            totalScore += currentScore;
+            currentColor = color;
+            currentScore = value;
         }
-        printf("\n");
     }
-    printf("\n");
+    totalScore += currentScore;
+    return totalScore;
 }
 
-void swaprot(tessere_t *tessera){
-    int tmpval; char tmpcol;
-    tmpval=(*tessera).val1;
-    (*tessera).val1=(*tessera).val2;
-    (*tessera).val2=tmpval;
-    tmpcol=(*tessera).col1;
-    (*tessera).col1=(*tessera).col2;
-    (*tessera).col2=tmpcol;
-}
 
-int controllapunteggio(cella_t  **board,int R,int C,tessere_t *tessere, int maxpunti,cella_t ****sol){
-    int i,j;
-    int orizzontale,verticale,totaleorizzontale=0,totaleverticale=0;
-    char checkcolor;
-    int flag;
-    for(i=0;i<R;i++){
+int calculateBoardScore() {
+    int totalScore = 0;
 
-        if(board[i][0].rot==0) checkcolor=board[i][0].tessere.col1;
-        else checkcolor=board[i][0].tessere.col2;
-        flag=1;
-        orizzontale=0;
-        for(j=0;j<R;j++){
-            if(board[i][j].rot==0 && checkcolor==board[i][j].tessere.col1 && flag==1){
-                orizzontale=orizzontale+board[i][j].tessere.val1;
-            }else if(board[i][j].rot==1 && checkcolor==board[i][j].tessere.col2 && flag==1){
-                orizzontale=orizzontale+board[i][j].tessere.val2;
-            }else{
-                orizzontale=0;
-                flag=0;
-            }
+    // Calcolo punteggio per le righe
+    for (int i = 0; i < R; i++) {
+        int indices[C], rotations[C];
+        for (int j = 0; j < C; j++) {
+            indices[j] = board[i][j].tileIndex;
+            rotations[j] = board[i][j].rotation;
         }
-        totaleorizzontale=totaleorizzontale+orizzontale;
-        //printf("%d ",orizzontale);
+        totalScore += calculateLineScore(indices, rotations, C, 1);
     }
-    //printf("\n");
 
-    for(j=0;j<C;j++){
-
-        if(board[0][j].rot==0) checkcolor=board[0][j].tessere.col2;
-        else checkcolor=board[0][j].tessere.col1;
-        flag=1;
-        verticale=0;
-        for(i=0;i<R;i++){
-            if(board[i][j].rot==0 && checkcolor==board[i][j].tessere.col2 && flag==1){
-                verticale=verticale+board[i][j].tessere.val2;
-            }else if(board[i][j].rot==1 && checkcolor==board[i][j].tessere.col1 && flag==1){
-                verticale=verticale+board[i][j].tessere.val1;
-            }else{
-                verticale=0;
-                flag=0;
-            }
+    // Calcolo punteggio per le colonne
+    for (int j = 0; j < C; j++) {
+        int indices[R], rotations[R];
+        for (int i = 0; i < R; i++) {
+            indices[i] = board[i][j].tileIndex;
+            rotations[i] = board[i][j].rotation;
         }
-        totaleverticale=totaleverticale+verticale;
-        //printf("%d ",verticale);
+        totalScore += calculateLineScore(indices, rotations, R, 0);
     }
-    //printf("\n");
-    //stampa(board,R,C);
-    if((totaleorizzontale+totaleverticale)>maxpunti){
-        maxpunti=totaleverticale+totaleorizzontale;
-        for(i=0;i<R;i++) for(j=0;j<C;j++) (**sol)[i][j]=board[i][j];
-        return maxpunti;
-    }
-    return maxpunti;
-}
 
-void deallocatutto(cella_t **sol,cella_t **board,tessere_t *tessere, int C){
-    int i;
-    for(i=0;i<C;i++){
-        free(sol[i]);
-        free(board[i]);
-    }
-    free(tessere);
-    free(sol);
-    free(board);
+    return totalScore;
 }
